@@ -15,15 +15,23 @@ class RacingAPIClient:
         self.timeout_seconds = float(api_cfg.get("timeout_seconds", 20))
         self.retries = int(api_cfg.get("retries", 3))
         self.backoff_seconds = float(api_cfg.get("backoff_seconds", 0.6))
+        self.auth_mode = str(api_cfg.get("auth_mode", "basic")).lower()
         self.auth_header = api_cfg.get("auth_header", "X-API-Key")
         self.endpoints = api_cfg.get("endpoints", {})
         self.api_key = os.getenv("RACING_API_KEY", "")
+        self.api_username = os.getenv("RACING_API_USERNAME", "")
+        self.api_password = os.getenv("RACING_API_PASSWORD", "")
 
     def _headers(self) -> dict[str, str]:
         headers = {"Accept": "application/json"}
-        if self.api_key:
+        if self.auth_mode == "apikey" and self.api_key:
             headers[self.auth_header] = self.api_key
         return headers
+
+    def _auth(self) -> httpx.BasicAuth | None:
+        if self.auth_mode == "basic" and self.api_username and self.api_password:
+            return httpx.BasicAuth(self.api_username, self.api_password)
+        return None
 
     def _url(self, endpoint_key: str, **kwargs: Any) -> str:
         template = self.endpoints.get(endpoint_key, "")
@@ -34,7 +42,12 @@ class RacingAPIClient:
         for attempt in range(self.retries + 1):
             try:
                 with httpx.Client(timeout=self.timeout_seconds) as client:
-                    response = client.get(url, headers=self._headers(), params=params)
+                    response = client.get(
+                        url,
+                        headers=self._headers(),
+                        params=params,
+                        auth=self._auth(),
+                    )
                     response.raise_for_status()
                     return response.json()
             except Exception as exc:  # fail-soft by caller

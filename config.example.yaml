@@ -1,16 +1,17 @@
 api:
-  base_url: "https://api.example-racing.com"
+  base_url: "https://api.theracingapi.com"
   country: "UK"
   timeout_seconds: 20
   retries: 3
   backoff_seconds: 0.6
+  auth_mode: "basic"  # "basic" | "apikey" | "none"
   auth_header: "X-API-Key"
   endpoints:
-    racecards: "/racecards"
-    race: "/races/{race_id}"
-    runner_history: "/horses/{horse_id}/history"
-    odds: "/odds/{race_id}"
-    results: "/results"
+    racecards: "/v1/racecards"
+    race: "/v1/races/{race_id}"
+    runner_history: "/v1/horses/{horse_id}/history"
+    odds: "/v1/odds/{race_id}"
+    results: "/v1/results"
 
 features:
   recent_form:

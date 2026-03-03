@@ -12,9 +12,16 @@ pip install -e .[dev]
 
 ## Configuration
 
-Copy `config.example.yaml` to `config.yaml` and update API endpoints/keys.
+Copy `config.example.yaml` to `config.yaml` and update API endpoints if needed.
 
-Set API key:
+Set The Racing API credentials (HTTP Basic Auth):
+
+```bash
+setx RACING_API_USERNAME "your_username"
+setx RACING_API_PASSWORD "your_password"
+```
+
+If you prefer header token auth, set `api.auth_mode: "apikey"` and:
 
 ```bash
 setx RACING_API_KEY "your_key"
