@@ -1,0 +1,96 @@
+api:
+  base_url: "https://api.example-racing.com"
+  country: "UK"
+  timeout_seconds: 20
+  retries: 3
+  backoff_seconds: 0.6
+  auth_header: "X-API-Key"
+  endpoints:
+    racecards: "/racecards"
+    race: "/races/{race_id}"
+    runner_history: "/horses/{horse_id}/history"
+    odds: "/odds/{race_id}"
+    results: "/results"
+
+features:
+  recent_form:
+    n_runs: 8
+    half_life_days: 90
+  distance:
+    band_pct: 0.10
+  going:
+    bucket_map:
+      good: ["Good", "Good to Soft"]
+      soft: ["Soft", "Heavy"]
+      firm: ["Firm", "Good to Firm"]
+      standard: ["Standard", "Standard to Slow"]
+  priors:
+    recent_form: 0.5
+    course_distance: 0.5
+    going: 0.5
+    handicap_ratings: 0.5
+    jockey: 0.5
+    trainer: 0.5
+    cheltenham_form: 0.5
+  confidence_saturation:
+    recent_form: 6
+    course_distance: 4
+    going: 4
+    handicap_ratings: 6
+    jockey: 10
+    trainer: 12
+    cheltenham_form: 4
+  cheltenham:
+    recency_years: 3
+    shrinkage_alpha: 2.0
+    shrinkage_beta: 3.0
+
+weights:
+  recent_form: 1.0
+  course_distance: 0.9
+  going: 0.8
+  handicap_ratings: 1.0
+  jockey: 0.7
+  trainer: 0.8
+  cheltenham_form: 1.2
+
+probability:
+  softmax_temperature_win: 0.16
+  softmax_temperature_place: 0.22
+  max_prob_cap: 0.70
+
+filters:
+  min_ev: 0.05
+  min_edge: 0.03
+  min_confidence: 0.60
+  min_field_size: 5
+  safest_min_win_prob: 0.20
+  top_n_value: 10
+
+place_rules:
+  fallback_by_field_size:
+    "5-7": 2
+    "8-11": 3
+    "12-15": 4
+    "16-99": 4
+
+storage:
+  backend: "sqlite"
+  sqlite_path: "artifacts/value_finder.sqlite3"
+  export_csv: false
+  csv_dir: "outputs/csv"
+
+calibration:
+  default_method: "platt"
+  holdout_ratio: 0.2
+  min_samples: 100
+  artifact_path: "artifacts/calibration_win.json"
+
+reporting:
+  output_dir: "outputs"
+  json_name: "value_report.json"
+  markdown_name: "value_report.md"
+
+refresh:
+  enabled: false
+  full_refetch: true
